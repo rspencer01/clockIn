@@ -1,0 +1,10 @@
+$def with (content)
+
+<html>
+  <body>
+    <h1>ClockIn</h1>
+    $if content.title:
+      <h2>$content.title</h2>
+    $:content
+  </body>
+</html>

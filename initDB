@@ -1,0 +1,26 @@
+#!/usr/bin/python
+import web
+import config
+
+database_configuration = config.getConfiguration('config/database.cfg')
+db = web.database(**database_configuration)
+print "Creating Tables"
+print "==============="
+db.query("CREATE TABLE IF NOT EXISTS users ("+\
+  "id int(11) NOT NULL AUTO_INCREMENT,"+\
+  "name varchar(60) DEFAULT NULL,"+\
+  "PRIMARY KEY (id));")
+db.query("CREATE TABLE IF NOT EXISTS work ("+\
+  "id INT NOT NULL AUTO_INCREMENT,"+\
+  "start DATETIME NOT NULL,"+\
+  "user INT NOT NULL,"+\
+  "job INT NOT NULL,"+\
+  "duration INT,"+\
+  "PRIMARY KEY (id),"+\
+  "FOREIGN KEY (user) REFERENCES users(id));")
+db.query("CREATE TABLE IF NOT EXISTS jobs("+\
+    "id INT NOT NULL AUTO_INCREMENT,"+\
+    "name VARCHAR(100) NOT NULL,"+\
+    "rate INT NOT NULL,"+\
+    "PRIMARY KEY (id));");
+
