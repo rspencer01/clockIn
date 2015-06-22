@@ -78,7 +78,7 @@ $code:
                 $job.name
               </td>
               <td>
-                ${i.duration/3600}:${i.duration/60}
+                ${i.duration/3600}:${(i.duration%3600)/60}
               </td>
             </tr>
           <tr class='totalLine'>
