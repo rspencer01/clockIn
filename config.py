@@ -18,25 +18,28 @@ import web.utils
 #
 # If the name of the configuration file is not specified,
 # the default is `options.cfg`.
-def getConfiguration(configFile="options.cfg"):
-  f = open(configFile,"r")
-  lns = [i[:-1] for i in f.readlines()]
-  f.close()
-  ans = web.utils.Storage()
-  for j in range(len(lns)):
-    lns[j] = lns[j].strip()
-    if lns[j].split()==[]:
-      continue
-    if lns[j][0]=='#':
-      continue
-    lns[j] = lns[j].split(':')
-    ans[lns[j][0].strip()] = eval(':'.join(lns[j][1:]))
-  return ans
+
+
+def get_configuration(config_file='options.cfg'):
+    f = open(config_file, 'r')
+    lns = [i[:-1] for i in f.readlines()]
+    f.close()
+    ans = web.utils.Storage()
+    for j in range(len(lns)):
+        lns[j] = lns[j].strip()
+        if not lns[j].split():
+            continue
+        if lns[j][0] == '#':
+            continue
+        lns[j] = lns[j].split(':')
+        ans[lns[j][0].strip()] = eval(':'.join(lns[j][1:]))
+    return ans
 
 # Execute a module test
-if __name__=='__main__':
-  import sys
-  if len(sys.argv)>1:
-    print getConfiguration(sys.argv[1])
-  else:
-    print getConfiguration()
+if __name__ == '__main__':
+    import sys
+
+    if len(sys.argv) > 1:
+        print get_configuration(sys.argv[1])
+    else:
+        print get_configuration()
