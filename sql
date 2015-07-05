@@ -3,9 +3,9 @@ import sys
 import os
 import config
 # Grab the database configuration
-configuration = config.getConfiguration('config/database.cfg')
+configuration = config.get_configuration('config/database.cfg')
 # Make a dummy file, called 't', and write the arguments to this
-a = open('t','w')
+a = open('t', 'w')
 a.write(' '.join(sys.argv[1:]))
 a.close()
 # Execute the MySQL.
