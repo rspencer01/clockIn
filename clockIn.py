@@ -45,6 +45,24 @@ def getTimeForMonth(month,year,job=currentJob):
   secondsThisMonth = db.query("SELECT SUM(duration) AS uptime FROM work WHERE start< CAST('"+nextDTS+"' AS DATETIME) AND start > CAST('"+DTS+"' AS DATETIME) AND job="+str(job))[0]["uptime"] or 0
   return int(secondsThisMonth)
 
+
+def plurality(word, count):
+    if count == 0 or count > 1:
+        return word + 's'
+    else:
+        return word
+
+
+def format_overview(label, time, hourly_rate):
+    template = '{:13s} {:3d} {hour:5s} {:2d} {min:7s} (R {:4.2f})'
+    hours = int(time / (60 * 60))
+    minutes = int((time / 60) % 60)
+    earnings = hourly_rate * time / (60 * 60)
+    hour = plurality("hour", hours)
+    minute = plurality("minute", minutes)
+    return template.format(label, hours, minutes,
+                           earnings, hour=hour, min=minute)
+
 def display():
   loggedIn = getLoggedIn()
   if loggedIn:
@@ -52,7 +70,9 @@ def display():
     time = db.query("SELECT start FROM work ORDER BY start DESC LIMIT 1")[0].start
     c = datetime.datetime.now() - time
     lgon = divmod(c.days * 86400 + c.seconds,60)
-    print "Logged in for",lgon[0]/60,"hours",lgon[0],"minutes and",lgon[1],"seconds"
+    print "Logged in for", lgon[0]/60, plurality("hour", lgon[0]/60), \
+        lgon[0] % 60, plurality("minute", lgon[0] % 60), "and", lgon[1], \
+        plurality("second", lgon[1])
     return
   else:
     print "\nCurrently logged out"
@@ -67,10 +87,12 @@ def display():
   m-=1
   lastmonth = str(y)+'-'+str(m)+"-01 00:00"
   secondsToday = db.query("SELECT SUM(duration) AS uptime FROM work WHERE start > CAST('"+today+"' AS DATETIME) AND job="+str(currentJob))[0]["uptime"] or 0
-  disp = lambda n,x: "{:13s} {:3d} hours {:2d} minutes (R {:4.2f})".format(n,int(x / (60 * 60)),int((x/60)%60),hourlyRate * x / (60*60))
-  print disp("Today:",secondsToday)
-  print disp("This Month:",getTimeForMonth(now.month,now.year,currentJob))
-  print disp("Last Month:",getTimeForMonth(m,y,currentJob))
+  print format_overview("Today:", secondsToday, hourlyRate)
+  print format_overview("This Month:",
+                        getTimeForMonth(now.month, now.year, currentJob),
+                        hourlyRate)
+  print format_overview("Last Month:", getTimeForMonth(m, y, currentJob),
+                        hourlyRate)
 
 def printJobs():
   print "{:3s} | {:40s} | {:4s}".format('Id','Name','Rate')
