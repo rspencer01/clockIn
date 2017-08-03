@@ -2,7 +2,6 @@
 
 import sys
 import os
-import argDec
 import web
 import datetime
 import config
@@ -133,18 +132,23 @@ help = """ClockIn
  -d Display hours worked in various timeframes
  -j The job number (required for some commands)"""
 
+
 if __name__ == '__main__':
-    args = argDec.arg_dec(sys.argv)
-    current_job = 'j' in args and args['j'] or -1
-    if 'j' in args and args['j'] is None:
-        print_jobs()
+    import argparse
+    parser = argparse.ArgumentParser(description="Timekeeping for money.")
+    parser.add_argument('-j', '--job', default=-1, type=int, help="The job ID")
+    parser.add_argument('-d', '--display', action='store_true', help="Display job info")
+    parser.add_argument('-l', action='store_true', help="Log in/out")
+    parser.add_argument('-ls', action='store_true', help="List jobs")
+    arguments = parser.parse_args()
 
-    if len(args) == 0 or 'h' in args:
-        print help
-        sys.exit(0)
+    current_job = arguments.job
 
-    if 'l' in args:
+    if arguments.ls:
+      print_jobs()
+
+    if arguments.l:
         login_and_logout()
 
-    if 'd' in args:
+    if arguments.display:
         display()
