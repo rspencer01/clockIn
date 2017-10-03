@@ -1,7 +1,5 @@
 import web
-import sys
 import subprocess
-import config
 import clockIn
 
 urls = ('/', 'index', '/invoice', 'invoice')
@@ -13,8 +11,11 @@ render = web.template.render('templates/', base='layout')
 
 class index:
     def GET(self):
-        details = subprocess.Popen(['clockIn', '-d'],
-                                   stdout=subprocess.PIPE).communicate()[0]
+        details = subprocess.Popen(
+            ['clockIn', '-d'],
+            stdout=subprocess.PIPE
+        ).communicate()[0]
+
         return render.index(details)
 
 
@@ -35,8 +36,14 @@ class invoice:
         total = clockIn.get_time_for_month(month, year, web.input().job)
         # job = clockIn.db.query('SELECT * FROM jobs WHERE id='+input().job)
         response = web.template.frender('templates/invoice.html')(
-            list(actions), month, year, 'detailed' in web.input(), total,
-            clockIn.db.select('jobs', where='id=' + web.input().job)[0])
+            list(actions),
+            month,
+            year,
+            'detailed' in web.input(),
+            total,
+            clockIn.db.select('jobs', where={'id': web.input().job})[0]
+        )
+
         return response
 
 
