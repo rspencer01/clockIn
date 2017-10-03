@@ -99,14 +99,21 @@ def plurality(word, count):
 
 
 def format_overview(label, time, hourly_rate):
-    template = '{:13s} {:3d} {hour:5s} {:2d} {min:7s} (R {:4.2f})'
     hours = int(time / (60 * 60))
+    hour_text = '{:3d} {:5s}'.format(hours, plurality('hour', hours))
+
     minutes = int((time / 60) % 60)
+    minute_text = '{:2d} {:7s}'.format(minutes, plurality('minute', minutes))
+
     earnings = hourly_rate * time / (60 * 60)
-    hour = plurality('hour', hours)
-    minute = plurality('minute', minutes)
-    return template.format(label, hours, minutes,
-                           earnings, hour=hour, min=minute)
+
+    template = '{label:13s} {hours} {minutes} (R {earnings:4.2f})'
+    return template.format(
+        label=label,
+        hours=hour_text,
+        minutes=minute_text,
+        earnings=earnings,
+    )
 
 
 def display():
