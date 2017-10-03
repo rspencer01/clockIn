@@ -64,14 +64,30 @@ def login_and_logout():
 
 
 def get_time_for_month(month, year, job=current_job):
-    y = year + (month == 12 and 1 or 0)
-    m = (month % 12) + 1
-    DTS = str(year) + '-' + str(month) + '-01 00:00:00'
-    nextDTS = str(y) + '-' + str(m) + '-01 00:00:00'
-    seconds_this_month = \
-        db.query("SELECT SUM(duration) AS uptime FROM work WHERE start< CAST('"
-                 + nextDTS + "' AS DATETIME) AND start > CAST('"
-                 + DTS + "' AS DATETIME) AND job="+str(job))[0]['uptime'] or 0
+    dts = '{year}-{month}-01 00:00:00'.format(year=year, month=month)
+
+    next_year = year + (month == 12 and 1 or 0)
+    next_month = (month % 12) + 1
+    next_dts = '{next_year}-{next_month}-01 00:00:00'.format(
+        next_year=next_year,
+        next_month=next_month,
+    )
+
+    seconds_this_month = db.select(
+        'work',
+        what='SUM(duration) as uptime',
+        where=(
+            'start < CAST($next_dts AS DATETIME) '
+            'AND start > CAST($dts AS DATETIME) '
+            'AND job=$job'
+        ),
+        vars={
+            'next_dts': next_dts,
+            'dts': dts,
+            'job': job,
+        }
+    )[0]['uptime'] or 0
+
     return int(seconds_this_month)
 
 
