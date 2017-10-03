@@ -1,0 +1,6 @@
+[flake8]
+exclude = .git,__pycache__
+max-line-length = 79
+
+# Example: https://github.com/PyCQA/flake8-import-order/blob/master/tests/test_cases/complete_smarkets.py
+import-order-style = smarkets
