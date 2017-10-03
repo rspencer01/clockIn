@@ -1,6 +1,8 @@
-import web
 import subprocess
+
 import clockIn
+
+import web
 
 urls = ('/', 'index', '/invoice', 'invoice')
 

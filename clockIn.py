@@ -1,9 +1,12 @@
 #!/usr/bin/python
 
-import os
-import web
 import datetime
+import os
+
+import web
+
 import config
+
 
 clock_in_dir = os.path.dirname(os.path.realpath(__file__))
 database_config_file_path = os.path.join(
