@@ -200,11 +200,11 @@ help = """ClockIn
 
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser(description="Timekeeping for money.")
-    parser.add_argument('-j', '--job', default=-1, type=int, help="The job ID")
-    parser.add_argument('-d', '--display', action='store_true', help="Display job info")
-    parser.add_argument('-l', action='store_true', help="Log in/out")
-    parser.add_argument('-ls', action='store_true', help="List jobs")
+    parser = argparse.ArgumentParser(description='Timekeeping for money.')
+    parser.add_argument('-j', '--job', default=-1, type=int, help='The job ID')
+    parser.add_argument('-d', '--display', action='store_true', help='Display job info')
+    parser.add_argument('-l', action='store_true', help='Log in/out')
+    parser.add_argument('-ls', action='store_true', help='List jobs')
     arguments = parser.parse_args()
 
     current_job = arguments.job
