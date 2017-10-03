@@ -36,18 +36,28 @@ def get_logged_in():
 
 def login_and_logout():
     logged_in = get_logged_in()
+
     if logged_in:
-        db.update('work',
-                  where='ISNULL(duration) AND user=1',
-                  duration=web.SQLLiteral(
-                      "UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(start)"))
+        db.update(
+            'work',
+            where='ISNULL(duration) AND user=1',
+            duration=web.SQLLiteral(
+                'UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(start)'
+            )
+        )
         print 'Logging out', current_job.name
     else:
         if current_job == -1:
             print 'ERROR: Select job id with -j'
             return
-        db.insert('work', start=web.SQLLiteral('NOW()'), user=1,
-                  job=current_job)
+
+        db.insert(
+            'work',
+            start=web.SQLLiteral('NOW()'),
+            user=1,
+            job=current_job
+        )
+
         print 'Logging in',
         logged_in = get_logged_in()
         print current_job.name
