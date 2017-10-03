@@ -1,6 +1,6 @@
-## 
+##
 # @namespace config
-# 
+#
 # System used for loading configurations from files.
 
 import web.utils
@@ -9,7 +9,7 @@ import web.utils
 #
 # Creates a dictionary out of configuration files.  Config
 # files should have extension `.cfg` and format
-#     
+#
 #     name : "someString"
 #     age  : someLiteral
 #     list : ['A','list','of','items']
