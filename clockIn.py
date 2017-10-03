@@ -184,7 +184,7 @@ if __name__ == '__main__':
     current_job = arguments.job
 
     if arguments.ls:
-      print_jobs()
+        print_jobs()
 
     if arguments.l:
         login_and_logout()
