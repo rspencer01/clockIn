@@ -6,7 +6,11 @@ import datetime
 import config
 
 clock_in_dir = os.path.dirname(os.path.realpath(__file__))
-database_config_file_path = os.path.join(clock_in_dir, 'config', 'database.cfg')
+database_config_file_path = os.path.join(
+    clock_in_dir,
+    'config',
+    'database.cfg'
+)
 database_configuration = config.get_configuration(database_config_file_path)
 
 db = web.database(**database_configuration)
