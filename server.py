@@ -23,20 +23,28 @@ class invoice:
     def GET(self):
         month = int(web.input().month)
         year = int(web.input().year)
-        next_month = month % 12 + 1
-        next_year = year + (month == 12 and 1 or 0)
+        this_month_datetime = '{year}-{month}-01 00:00:00'.format(
+            year=year,
+            month=month
+        )
+
+        next_month = (month % 12) + 1
+        next_month_year = year + (1 if month == 12 else 0)
+        next_month_datetime = '{year}-{month}-01 00:00:00'.format(
+            year=next_month_year,
+            month=next_month
+        )
+
         actions = clockIn.db.select(
             'work',
             where=(
-                'start > $year-$month-01 00:00:00" '
-                'AND start < $next_year-$next_month-01 00:00:00" '
+                'start > $this_month '
+                'AND start < $next_month '
                 'AND JOB=$job'
             ),
             vars={
-                'year': year,
-                'month': month,
-                'next_year': next_year,
-                'next_month': next_month,
+                'this_month': this_month_datetime,
+                'next_month': next_month_datetime,
                 'job': web.input().job
             }
         )
