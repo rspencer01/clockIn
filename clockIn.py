@@ -125,49 +125,68 @@ def format_overview(label, time, hourly_rate):
 
 def display():
     logged_in = get_logged_in()
+
     if logged_in:
         print '\nCurrently logged in on job', current_job.name
-        time = db.query('SELECT start FROM work '
-                        'ORDER BY start DESC LIMIT 1')[0].start
-        time_working = datetime.datetime.now() - time
-        lgon = divmod(time_working.days * 86400 + time_working.seconds, 60)
-        hours = lgon[0] / 60
-        minutes = lgon[0] % 60
-        seconds = lgon[1]
-        print 'Logged in for', hours, plurality('hour', hours), minutes, \
-            plurality('minute', minutes), 'and', \
+
+        start_time = db.select('work', order='start DESC', limit=1)[0].start
+        time_working = datetime.datetime.now() - start_time
+
+        logon = divmod(time_working.days * 86400 + time_working.seconds, 60)
+        hours = logon[0] / 60
+        minutes = logon[0] % 60
+        seconds = logon[1]
+        print(
+            'Logged in for', hours, plurality('hour', hours),
+            minutes, plurality('minute', minutes), 'and',
             seconds, plurality('second', seconds)
+        )
         return
     else:
         print '\nCurrently logged out'
+
     if current_job == -1:
         return
-    hourly_rate = db.select('jobs', where='id=' + str(current_job))[0].rate
+
+    hourly_rate = db.select('jobs', where={'id': str(current_job)})[0].rate
     print '=' * 20
+
     now = datetime.datetime.now()
     today = now.strftime('%Y-%m-%d')
     year, month = now.year, now.month
+
     if month == 1:
         month, year = 13, year - 1
+
     month -= 1
-    last_month = str(year) + '-' + str(month) + '-01 00:00'
-    seconds_today = db.query("SELECT SUM(duration) AS uptime FROM work "
-                             "WHERE start > CAST('" + today + "' AS DATETIME) "
-                             "AND job=" + str(current_job))[0]['uptime'] or 0
+    last_month = '{year}-{month}-01 00:00'.format(year=year, month=month)
+
+    seconds_today = db.select(
+        'work',
+        what='SUM(duration) AS uptime',
+        where='start > CAST($today AS DATETIME) AND job=$job',
+        vars={'today': today, 'job': current_job}
+    )[0]['uptime'] or 0
+
     print format_overview('Today:', seconds_today, hourly_rate)
-    print format_overview('This Month:',
-                          get_time_for_month(now.month, now.year, current_job),
-                          hourly_rate)
-    print format_overview('Last Month:',
-                          get_time_for_month(month, year, current_job),
-                          hourly_rate)
+    print format_overview(
+        'This Month:',
+        get_time_for_month(now.month, now.year, current_job),
+        hourly_rate
+    )
+    print format_overview(
+        'Last Month:',
+        get_time_for_month(month, year, current_job),
+        hourly_rate
+    )
 
 
 def print_jobs():
     print '{:3s} | {:40s} | {:4s}'.format('Id', 'Name', 'Rate')
     print '-' * 53
-    for i in db.select('jobs'):
-        print '{id:3d} | {name:40s} | R{rate:3d}'.format(**i)
+
+    for job in db.select('jobs'):
+        print '{id:3d} | {name:40s} | R{rate:3d}'.format(**job)
 
 
 help = """ClockIn
