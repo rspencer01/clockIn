@@ -25,14 +25,21 @@ class invoice:
         year = int(web.input().year)
         next_month = month % 12 + 1
         next_year = year + (month == 12 and 1 or 0)
-        actions = clockIn.db.select('work',
-                                    where='start>"' + str(year) + '-' +
-                                          str(month) +
-                                          '-01 00:00:00" AND start<"' +
-                                          str(next_year) + '-' +
-                                          str(next_month) +
-                                          '-01 00:00:00" AND JOB=' +
-                                          web.input().job)
+        actions = clockIn.db.select(
+            'work',
+            where=(
+                'start > $year-$month-01 00:00:00" '
+                'AND start < $next_year-$next_month-01 00:00:00" '
+                'AND JOB=$job'
+            ),
+            vars={
+                'year': year,
+                'month': month,
+                'next_year': next_year,
+                'next_month': next_month,
+                'job': web.input().job
+            }
+        )
         total = clockIn.get_time_for_month(month, year, web.input().job)
         # job = clockIn.db.query('SELECT * FROM jobs WHERE id='+input().job)
         response = web.template.frender('templates/invoice.html')(
