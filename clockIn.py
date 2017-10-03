@@ -3,9 +3,9 @@
 import datetime
 import os
 
-import web
-
 import config
+
+import web
 
 
 clock_in_dir = os.path.dirname(os.path.realpath(__file__))
