@@ -19,13 +19,18 @@ current_job = -1
 def get_logged_in():
     logged_in = 0
     global current_job
-    last = list(db.query('SELECT * FROM work ORDER BY start DESC LIMIT 1'))
+    last = list(db.select('work', order='start DESC', limit=1))
+
     if len(last) > 0:
         logged_in = last[0]['duration'] is None
+
     if logged_in:
         current_job = db.query(
-            'SELECT jobs.* FROM work JOIN jobs ON work.job=jobs.id '
-            'ORDER BY work.start DESC LIMIT 1')[0]
+            'SELECT jobs.* FROM work '
+            'JOIN jobs ON work.job=jobs.id '
+            'ORDER BY work.start DESC '
+            'LIMIT 1'
+        )[0]
     return logged_in
 
 
