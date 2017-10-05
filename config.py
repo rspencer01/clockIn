@@ -26,7 +26,7 @@ def get_configuration(config_file='options.cfg'):
     config_storage = web.utils.Storage()
 
     for index, line in enumerate(lines):
-        lines[index] = line.strip()
+        line = line.strip()
 
         if not line.split():
             continue
@@ -34,8 +34,8 @@ def get_configuration(config_file='options.cfg'):
         if line.startswith('#'):
             continue
 
-        lines[index] = line.split(':')
-        config_storage[line.strip()] = eval(':'.join(line[1:]))
+        line = line.split(':')
+        config_storage[line[0].strip()] = eval(':'.join(line[1:]))
 
     return config_storage
 
