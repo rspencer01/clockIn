@@ -4,203 +4,228 @@ body
   margin: 0;
   padding: 0;
 }
+
 .container
 {
-  width : 80%;
-  margin-left : auto;
-  margin-right : auto;
-  border-left : 1px solid black;
-  border-right : 1px solid black;
-  border-bottom : 1px solid black;
-  padding : 40px;
-  border-radius : 0px 0px 10px 10px;
-  margin-bottom : 30px;
-  padding-bottom : 0px;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  border-radius: 0 0 10px 10px;
+  margin-bottom: 30px;
+  padding: 40px 40px 0;
 }
-h1,h2
+
+h1, h2
 {
-  display : block;
-  text-align : center;
+  display: block;
+  text-align: center;
 }
+
 h1
 {
-  font-size : 60px;
-  margin-top : 0px;
+  font-size: 60px;
+  margin-top: 0;
 }
+
 h2
 {
-  margin-bottom : 30px;
+  margin-bottom: 30px;
 }
+
 .footer
 {
-  bottom : 0px;
-  border-top : 1px solid black;
-  width : 100%;
-  font-size : 10px;
-  padding : 5px;
-  height : 20px;
-  margin-left : auto;
-  margin-right : auto;
-  margin-top : 20px;
+  bottom: 0;
+  border-top: 1px solid black;
+  width: 100%;
+  font-size: 10px;
+  padding: 5px;
+  height: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
 }
+
 .footerclear
 {
-  height : 40px;
+  height: 40px;
 }
 
 label
 {
-  display : block;
-  text-align : center;
-  font-weight : bold;
-  font-size : 20px;
+  display: block;
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
   border: 1px solid black;
-  border-radius : 10px 10px 0px 0px;
-  padding:5px;
+  border-radius: 10px 10px 0 0;
+  padding: 5px;
 }
 
-.contactDetails,.bankingDetails
+.contactDetails, .bankingDetails
 {
-  display : inline-block;
-  width : 35%;
-  vertical-align : top;
+  display: inline-block;
+  width: 35%;
+  vertical-align: top;
 }
+
 .contactDetails
 {
-  margin-left : 12%;
-  margin-right : 3%;
+  margin-left: 12%;
+  margin-right: 3%;
 }
+
 .bankingDetails
 {
-  margin-right : 12%;
-  margin-left : 3%;
+  margin-right: 12%;
+  margin-left: 3%;
 }
 
 ul
 {
-  list-style-type : none;
-  padding : 10px;
-  margin : 0px;
-  border : 1px solid black;
-  border-top : none;
-  border-radius : 0px 0px 10px 10px;
+  list-style-type: none;
+  padding: 10px;
+  margin: 0;
+  border: 1px solid black;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
 }
+
 ul b
 {
-  display : inline-block;
-  width : 30%;
-  text-align : right;
-  padding-right : 10px;
-  border-right : 1px solid black;
-  margin-right : 10px;
+  display: inline-block;
+  width: 30%;
+  text-align: right;
+  padding-right: 10px;
+  border-right: 1px solid black;
+  margin-right: 10px;
 }
 
 .customerDetails
 {
-  display : block;
-  width : 30%;
-  margin-left : 35%;
-  margin-top : 20px;
+  display: block;
+  width: 30%;
+  margin-left: 35%;
+  margin-top: 20px;
 }
+
 table
 {
-  padding : 5px;
-  border-collapse : separate;
-  border-spacing : 0;
-  text-align : right;
-  width : 80%;
-  margin-left : 10%;
+  padding: 5px;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: right;
+  width: 80%;
+  margin-left: 10%;
 }
+
 th:first-child
 {
-  text-align : left;
+  text-align: left;
 }
+
 tr:first-child th:last-child
 {
-  padding-right : 10px;
+  padding-right: 10px;
 }
+
 tr:first-child th
 {
-  border-bottom : 1px solid black;
-  border-top : 1px solid black;
-  padding-bottom : 5px;
-  padding-right : 0px;
+  border-bottom: 1px solid black;
+  border-top: 1px solid black;
+  padding-bottom: 5px;
+  padding-right: 0;
 }
+
 tr:first-child th:first-child
 {
-  border-left : 1px solid black;
-  border-radius: 10px 0px 0px 0px;
+  border-left: 1px solid black;
+  border-radius: 10px 0 0 0;
 }
+
 tr:first-child th:last-child
 {
   border-right: 1px solid black;
-  border-radius: 0px 10px 0px 0px;
+  border-radius: 0 10px 0 0;
 }
+
 td:first-child
 {
-  border-left : 1px solid black;
-  text-align : left;
-  padding-left : 10px;
+  border-left: 1px solid black;
+  text-align: left;
+  padding-left: 10px;
 }
+
 td:last-child
 {
-  border-right : 1px solid black;
-  padding-right : 10px;
+  border-right: 1px solid black;
+  padding-right: 10px;
 }
+
 tr:last-child td
 {
-  border-bottom : 1px solid black;
-  padding-bottom : 10px;
+  border-bottom: 1px solid black;
+  padding-bottom: 10px;
 }
+
 tr:last-child td:first-child
 {
-  border-radius: 0px 0px 0px 10px;
+  border-radius: 0 0 0 10px;
 }
+
 tr:last-child td:last-child
 {
-  border-radius: 0px 0px 10px 0px;
+  border-radius: 0 0 10px 0;
 }
+
 th
 {
-  padding : 10px;
+  padding: 10px;
 }
 
 tr.totalLine td
 {
-  border-top : 1px solid black;
-  text-align : right;
+  border-top: 1px solid black;
+  text-align: right;
 }
 
-@media print 
+@media print
 {
-  body 
+  body
   {
-    font-size : 11pt;
+    font-size: 11pt;
   }
+
   .container
   {
-    padding: 0px;
-    width : 100%;
-    border : none;
+    padding: 0;
+    width: 100%;
+    border: none;
   }
+
   .contactDetails
   {
-    margin-left : 2%;
-    width : 45%;
+    margin-left: 2%;
+    width: 45%;
   }
+
   .bankingDetails
   {
-    margin-right : 2%;
-    width : 45%;
+    margin-right: 2%;
+    width: 45%;
   }
+
   .customerDetails
   {
-    width : 70%;
-    margin-left : 15%;
+    width: 70%;
+    margin-left: 15%;
   }
+
   .btc
   {
-    font-size : 7pt;
-    line-height : 11pt;
+    font-size: 7pt;
+    line-height: 11pt;
   }
 }

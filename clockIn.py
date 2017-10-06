@@ -1,13 +1,21 @@
 #!/usr/bin/python
 
-import sys
-import os
-import web
 import datetime
+import os
+
 import config
 
-database_configuration = config.get_configuration('/'.join(
-    os.path.realpath(__file__).split('/')[:-1]) + '/config/database.cfg')
+import web
+
+
+clock_in_dir = os.path.dirname(os.path.realpath(__file__))
+database_config_file_path = os.path.join(
+    clock_in_dir,
+    'config',
+    'database.cfg'
+)
+database_configuration = config.get_configuration(database_config_file_path)
+
 db = web.database(**database_configuration)
 # Todo: correct this
 db.printing = False
@@ -18,44 +26,75 @@ current_job = -1
 def get_logged_in():
     logged_in = 0
     global current_job
-    last = list(db.query('SELECT * FROM work ORDER BY start DESC LIMIT 1'))
+    last = list(db.select('work', order='start DESC', limit=1))
+
     if len(last) > 0:
         logged_in = last[0]['duration'] is None
+
     if logged_in:
         current_job = db.query(
-            'SELECT jobs.* FROM work JOIN jobs ON work.job=jobs.id '
-            'ORDER BY work.start DESC LIMIT 1')[0]
+            'SELECT jobs.* FROM work '
+            'JOIN jobs ON work.job=jobs.id '
+            'ORDER BY work.start DESC '
+            'LIMIT 1'
+        )[0]
     return logged_in
 
 
 def login_and_logout():
     logged_in = get_logged_in()
+
     if logged_in:
-        db.update('work',
-                  where='ISNULL(duration) AND user=1',
-                  duration=web.SQLLiteral(
-                      "UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(start)"))
+        db.update(
+            'work',
+            where='ISNULL(duration) AND user=1',
+            duration=web.SQLLiteral(
+                'UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(start)'
+            )
+        )
         print 'Logging out', current_job.name
     else:
         if current_job == -1:
             print 'ERROR: Select job id with -j'
             return
-        db.insert('work', start=web.SQLLiteral('NOW()'), user=1,
-                  job=current_job)
+
+        db.insert(
+            'work',
+            start=web.SQLLiteral('NOW()'),
+            user=1,
+            job=current_job
+        )
+
         print 'Logging in',
         logged_in = get_logged_in()
         print current_job.name
 
 
 def get_time_for_month(month, year, job=current_job):
-    y = year + (month == 12 and 1 or 0)
-    m = (month % 12) + 1
-    DTS = str(year) + '-' + str(month) + '-01 00:00:00'
-    nextDTS = str(y) + '-' + str(m) + '-01 00:00:00'
-    seconds_this_month = \
-        db.query("SELECT SUM(duration) AS uptime FROM work WHERE start< CAST('"
-                 + nextDTS + "' AS DATETIME) AND start > CAST('"
-                 + DTS + "' AS DATETIME) AND job="+str(job))[0]['uptime'] or 0
+    dts = '{year}-{month}-01 00:00:00'.format(year=year, month=month)
+
+    next_year = year + (month == 12 and 1 or 0)
+    next_month = (month % 12) + 1
+    next_dts = '{next_year}-{next_month}-01 00:00:00'.format(
+        next_year=next_year,
+        next_month=next_month,
+    )
+
+    seconds_this_month = db.select(
+        'work',
+        what='SUM(duration) as uptime',
+        where=(
+            'start < CAST($next_dts AS DATETIME) '
+            'AND start > CAST($dts AS DATETIME) '
+            'AND job=$job'
+        ),
+        vars={
+            'next_dts': next_dts,
+            'dts': dts,
+            'job': job,
+        }
+    )[0]['uptime'] or 0
+
     return int(seconds_this_month)
 
 
@@ -67,61 +106,87 @@ def plurality(word, count):
 
 
 def format_overview(label, time, hourly_rate):
-    template = '{:13s} {:3d} {hour:5s} {:2d} {min:7s} (R {:4.2f})'
     hours = int(time / (60 * 60))
+    hour_text = '{:3d} {:5s}'.format(hours, plurality('hour', hours))
+
     minutes = int((time / 60) % 60)
+    minute_text = '{:2d} {:7s}'.format(minutes, plurality('minute', minutes))
+
     earnings = hourly_rate * time / (60 * 60)
-    hour = plurality('hour', hours)
-    minute = plurality('minute', minutes)
-    return template.format(label, hours, minutes,
-                           earnings, hour=hour, min=minute)
+
+    template = '{label:13s} {hours} {minutes} (R {earnings:4.2f})'
+    return template.format(
+        label=label,
+        hours=hour_text,
+        minutes=minute_text,
+        earnings=earnings,
+    )
 
 
 def display():
     logged_in = get_logged_in()
+
     if logged_in:
         print '\nCurrently logged in on job', current_job.name
-        time = db.query('SELECT start FROM work '
-                        'ORDER BY start DESC LIMIT 1')[0].start
-        time_working = datetime.datetime.now() - time
-        lgon = divmod(time_working.days * 86400 + time_working.seconds, 60)
-        hours = lgon[0] / 60
-        minutes = lgon[0] % 60
-        seconds = lgon[1]
-        print 'Logged in for', hours, plurality('hour', hours), minutes, \
-            plurality('minute', minutes), 'and', \
+
+        start_time = db.select('work', order='start DESC', limit=1)[0].start
+        time_working = datetime.datetime.now() - start_time
+
+        logon = divmod(time_working.days * 86400 + time_working.seconds, 60)
+        hours = logon[0] / 60
+        minutes = logon[0] % 60
+        seconds = logon[1]
+        print(
+            'Logged in for', hours, plurality('hour', hours),
+            minutes, plurality('minute', minutes), 'and',
             seconds, plurality('second', seconds)
+        )
         return
     else:
         print '\nCurrently logged out'
+
     if current_job == -1:
         return
-    hourly_rate = db.select('jobs', where='id=' + str(current_job))[0].rate
+
+    hourly_rate = db.select('jobs', where={'id': str(current_job)})[0].rate
     print '=' * 20
+
     now = datetime.datetime.now()
     today = now.strftime('%Y-%m-%d')
     year, month = now.year, now.month
+
     if month == 1:
         month, year = 13, year - 1
+
     month -= 1
-    last_month = str(year) + '-' + str(month) + '-01 00:00'
-    seconds_today = db.query("SELECT SUM(duration) AS uptime FROM work "
-                             "WHERE start > CAST('" + today + "' AS DATETIME) "
-                             "AND job=" + str(current_job))[0]['uptime'] or 0
+    last_month = '{year}-{month}-01 00:00'.format(year=year, month=month)
+
+    seconds_today = db.select(
+        'work',
+        what='SUM(duration) AS uptime',
+        where='start > CAST($today AS DATETIME) AND job=$job',
+        vars={'today': today, 'job': current_job}
+    )[0]['uptime'] or 0
+
     print format_overview('Today:', seconds_today, hourly_rate)
-    print format_overview('This Month:',
-                          get_time_for_month(now.month, now.year, current_job),
-                          hourly_rate)
-    print format_overview('Last Month:',
-                          get_time_for_month(month, year, current_job),
-                          hourly_rate)
+    print format_overview(
+        'This Month:',
+        get_time_for_month(now.month, now.year, current_job),
+        hourly_rate
+    )
+    print format_overview(
+        'Last Month:',
+        get_time_for_month(month, year, current_job),
+        hourly_rate
+    )
 
 
 def print_jobs():
     print '{:3s} | {:40s} | {:4s}'.format('Id', 'Name', 'Rate')
     print '-' * 53
-    for i in db.select('jobs'):
-        print '{id:3d} | {name:40s} | R{rate:3d}'.format(**i)
+
+    for job in db.select('jobs'):
+        print '{id:3d} | {name:40s} | R{rate:3d}'.format(**job)
 
 
 help = """ClockIn
@@ -135,17 +200,22 @@ help = """ClockIn
 
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser(description="Timekeeping for money.")
-    parser.add_argument('-j', '--job', default=-1, type=int, help="The job ID")
-    parser.add_argument('-d', '--display', action='store_true', help="Display job info")
-    parser.add_argument('-l', action='store_true', help="Log in/out")
-    parser.add_argument('-ls', action='store_true', help="List jobs")
+    parser = argparse.ArgumentParser(description='Timekeeping for money.')
+    parser.add_argument('-j', '--job', default=-1, type=int, help='The job ID')
+    parser.add_argument(
+        '-d',
+        '--display',
+        action='store_true',
+        help='Display job info'
+    )
+    parser.add_argument('-l', action='store_true', help='Log in/out')
+    parser.add_argument('-ls', action='store_true', help='List jobs')
     arguments = parser.parse_args()
 
     current_job = arguments.job
 
     if arguments.ls:
-      print_jobs()
+        print_jobs()
 
     if arguments.l:
         login_and_logout()

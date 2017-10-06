@@ -1,16 +1,15 @@
-## 
+##
 # @namespace config
-# 
+#
 # System used for loading configurations from files.
 
-import os
 import web.utils
 
-## Creates a dictionary object out of a configuration file
+# Creates a dictionary object out of a configuration file
 #
 # Creates a dictionary out of configuration files.  Config
 # files should have extension `.cfg` and format
-#     
+#
 #     name : "someString"
 #     age  : someLiteral
 #     list : ['A','list','of','items']
@@ -21,19 +20,25 @@ import web.utils
 
 
 def get_configuration(config_file='options.cfg'):
-    f = open(config_file, 'r')
-    lns = [i[:-1] for i in f.readlines()]
-    f.close()
-    ans = web.utils.Storage()
-    for j in range(len(lns)):
-        lns[j] = lns[j].strip()
-        if not lns[j].split():
+    with open(config_file, 'r') as config_file:
+        lines = [line[:-1] for line in config_file.readlines()]
+
+    config_storage = web.utils.Storage()
+
+    for index, line in enumerate(lines):
+        line = line.strip()
+
+        if not line.split():
             continue
-        if lns[j][0] == '#':
+
+        if line.startswith('#'):
             continue
-        lns[j] = lns[j].split(':')
-        ans[lns[j][0].strip()] = eval(':'.join(lns[j][1:]))
-    return ans
+
+        line = line.split(':')
+        config_storage[line[0].strip()] = eval(':'.join(line[1:]))
+
+    return config_storage
+
 
 # Execute a module test
 if __name__ == '__main__':
