@@ -136,10 +136,10 @@ def display():
         hours = logon[0] / 60
         minutes = logon[0] % 60
         seconds = logon[1]
-        print(
-            'Logged in for', hours, plurality('hour', hours),
-            minutes, plurality('minute', minutes), 'and',
-            seconds, plurality('second', seconds)
+        print 'Logged in for {hours} {minutes} {seconds}'.format(
+            hours='{} {}'.format(hours, plurality('hour', hours)),
+            minutes='{} {}'.format(minutes, plurality('minute', minutes)),
+            seconds='{} {}'.format(seconds, plurality('second', seconds))
         )
         return
     else:
