@@ -1,4 +1,5 @@
-$def with (details)
-$var title=""
+$def with (details, job=None)
+$var title = ""
+$var header = "{name} Info".format(name=(job.name if job else "ClockIn"))
 
 <pre>$details</pre>

@@ -26,7 +26,7 @@ class index:
             stdout=subprocess.PIPE
         ).communicate()[0]
 
-        return render.index(details)
+        return render.index(details, job=job)
 
 
 class invoice:
