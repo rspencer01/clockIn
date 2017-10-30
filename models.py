@@ -19,7 +19,7 @@ Base = declarative_base()
 
 
 class User(Base):
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(length=255))
@@ -37,7 +37,7 @@ class User(Base):
 
 
 class Job(Base):
-    __tablename__ = 'job'
+    __tablename__ = 'jobs'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(length=255))
