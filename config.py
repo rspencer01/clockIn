@@ -2,6 +2,7 @@
 # @namespace config
 #
 # System used for loading configurations from files.
+import os
 
 import web.utils
 
@@ -38,6 +39,16 @@ def get_configuration(config_file='options.cfg'):
         config_storage[line[0].strip()] = eval(':'.join(line[1:]))
 
     return config_storage
+
+
+CLOCK_IN_DIR = os.path.dirname(os.path.realpath(__file__))
+DATABASE_CONFIG_FILE_PATH = os.path.join(
+    CLOCK_IN_DIR,
+    'config',
+    'database.cfg'
+)
+
+DB_CONF = get_configuration(DATABASE_CONFIG_FILE_PATH)
 
 
 # Execute a module test

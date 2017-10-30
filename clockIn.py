@@ -1,22 +1,13 @@
 #!/usr/bin/python
 
 import datetime
-import os
-
-import config
 
 import web
 
+from config import DB_CONF
 
-clock_in_dir = os.path.dirname(os.path.realpath(__file__))
-database_config_file_path = os.path.join(
-    clock_in_dir,
-    'config',
-    'database.cfg'
-)
-database_configuration = config.get_configuration(database_config_file_path)
 
-db = web.database(**database_configuration)
+db = web.database(**DB_CONF)
 # Todo: correct this
 db.printing = False
 
