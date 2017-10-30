@@ -1,3 +1,4 @@
+from datetime import datetime
 import subprocess
 
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -40,8 +41,11 @@ class index:
 
 class invoice:
     def GET(self):
-        month = int(web.input().month)
-        year = int(web.input().year)
+        today = datetime.utcnow()
+
+        month = web.intget('month', today.month)
+        year = web.intget('year', today.year)
+
         this_month_datetime = '{year}-{month}-01 00:00:00'.format(
             year=year,
             month=month
