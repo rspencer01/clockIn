@@ -29,7 +29,7 @@ class User(Base):
     email = Column(String(length=255), nullable=True)
 
     bank_name = Column(String(length=255), nullable=True)
-    branch_code = Column(String(length=255), nullable=True)
+    branch = Column(String(length=255), nullable=True)
     account_number = Column(String(length=255), nullable=True)
     btc_wallet_address = Column(String(length=255), nullable=True)
 
