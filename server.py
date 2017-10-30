@@ -70,19 +70,18 @@ class invoice:
                 'next_month': next_month_datetime,
                 'job': web.input().job
             }
-        )
-        total = clockIn.get_time_for_month(month, year, web.input().job)
-        # job = clockIn.db.query('SELECT * FROM jobs WHERE id='+input().job)
-        response = web.template.frender('templates/invoice.html')(
-            list(actions),
-            month,
-            year,
-            'detailed' in web.input(),
-            total,
-            clockIn.db.select('jobs', where={'id': web.input().job})[0]
-        )
+        ).all()
 
-        return response
+        job_id = web.intget('job')
+
+        total = clockIn.get_time_for_month(month, year, job_id)
+        job = clockIn.db.select('jobs', where={'id': job_id}).first()
+
+        detailed_invoice = 'detailed' in web.input()
+
+        invoice_template = web.template.frender('templates/invoice.html')
+
+        return invoice_template(actions, month, year, detailed_invoice, total, job)
 
 
 if __name__ == '__main__':
