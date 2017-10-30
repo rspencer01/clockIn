@@ -6,20 +6,24 @@ $code:
   <head>
     <link rel='stylesheet' type='text/css' href='/static/invoice.css'> 
   </head>
+
   <body>
     <div class="container">
       <div class="header">
         <h1>wwwdev</h1>
+
         <h2>Invoice for $textMonth $year</h2>
-        <span class='contactDetails'>
+
+        <div class='contactDetails'>
           <label>Contact Details</label>
           <ul>
             <li><b>Phone</b> +27 (0)76 021 8434</li>
             <li><b>Fax</b> +27 (0)21 532 2351</li>
             <li><b>Email</b> info@wwwdev.co.za</li>
           </ul>
-        </span>
-        <span class='bankingDetails'>
+        </div>
+
+        <div class='bankingDetails'>
           <label>Banking Details</label>
           <ul>
             <li><b>Bank</b> Capitec Bank Limited</li>
@@ -27,15 +31,17 @@ $code:
             <li><b>Account</b> 1339426860</li>
             <li><b>BTC Wallet</b> <span class='btc'>1PhLe61vdJwrWfnR4pi5r8JSMmsL7eMfe3</span></li>
           </ul>
-        </span>
+        </div>
       </div>
-      <span class='customerDetails'>
+
+      <div class='customerDetails'>
         <label>Customer Details</label>
         <ul>
           <li><b>Attention</b> Alex Hawkings and Roger Zeino</li>
           <li><b>Invoice Date</b> ${year + (month == 12 and 1 or 0)}-${"{:02d}".format(month % 12 + 1)}-01</li>
         </ul>
-      </span>
+      </div>
+
       <h3>Invoice Overview</h3>
       <table>
         <tr>
@@ -46,15 +52,15 @@ $code:
         </tr>
         <tr>
           <td>Contract work</td>
-          <td>R$"{:,.2f}.format(job.rate)</td>
-          <td>$"{:.3f}".format(total / 3600.0)</td>
-          <td>$"R {:,.2f}".format(job.rate * total / 3600.0).replace(',',' ')</td>
+          <td>R${"{:,.2f}".format(job.rate)}</td>
+          <td>${"{:.3f}".format(total / 3600.0)}</td>
+          <td>${"R {:,.2f}".format(job.rate * total / 3600.0).replace(',',' ')}</td>
         </tr>
         <tr class='totalLine'>
           <td colspan=3>
             <b>Total</b>
           </td>
-          <td><b>$"R {:,.2f}".format(job.rate * total / 3600.0).replace(',',' ')</b></td>
+          <td><b>${"R {:,.2f}".format(job.rate * total / 3600.0).replace(',',' ')}</b></td>
         </tr>
         <tr>
           <td>&nbsp</td>
@@ -72,6 +78,7 @@ $code:
             <th> Description </th>
             <th> Duration </th>
           </tr>
+
           $for action in actions:
             <tr>
               <td>
@@ -84,6 +91,7 @@ $code:
                 ${action.duration / 3600}:${(action.duration % 3600) / 60}
               </td>
             </tr>
+
           <tr class='totalLine'>
             <td colspan=2>
               <b>Total</b>
@@ -93,6 +101,7 @@ $code:
             </td>
           </tr>
         </table>
+
       <div class="footer">
         Please note that we use sub-minute timing but this invoice reports to minute rounding.
         Thus please allow for these discrepancies.
