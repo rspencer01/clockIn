@@ -21,12 +21,14 @@ class index:
             command.extend(['-j', job])
             job = clockIn.db.select('jobs', where={'id': job}).first()
 
+        all_jobs = clockIn.db.select('jobs')
+
         details = subprocess.Popen(
             command,
             stdout=subprocess.PIPE
         ).communicate()[0]
 
-        return render.index(details, job=job)
+        return render.index(details, all_jobs=all_jobs, selected_job=job)
 
 
 class invoice:

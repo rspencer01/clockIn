@@ -1,5 +1,19 @@
-$def with (details, job=None)
+$def with (details, all_jobs, selected_job=None)
 $var title = ""
-$var header = "{name} Info".format(name=(job.name if job else "ClockIn"))
+$var header = "{name} Info".format(name=(selected_job.name if selected_job else "ClockIn"))
+
+<form name="job_select_form">
+  <label for="job-select">Job: </label>
+  <select id="job-select" name="job">
+    <option value="None">None</option>
+
+    $for job in all_jobs:
+      <option value="$job.id" ${'selected' if job == selected_job else ''}>
+        $job.name
+      </option>
+  </select>
+</form>
 
 <pre>$details</pre>
+
+<script src="static/js/index_job_select.js"></script>
