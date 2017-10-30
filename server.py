@@ -13,8 +13,16 @@ render = web.template.render('templates/', base='layout')
 
 class index:
     def GET(self):
+        command = ['python', 'clockIn.py', '-d']
+
+        job = web.input(job=None).job
+
+        if job:
+            command.extend(['-j', job])
+            job = clockIn.db.select('jobs', where={'id': job}).first()
+
         details = subprocess.Popen(
-            ['clockIn', '-d'],
+            command,
             stdout=subprocess.PIPE
         ).communicate()[0]
 
