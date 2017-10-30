@@ -1,14 +1,31 @@
 import subprocess
 
-import clockIn
-
+from sqlalchemy.orm import scoped_session, sessionmaker
 import web
 
-urls = ('/', 'index', '/invoice', 'invoice')
+import clockIn
+from models import engine
+
+
+def load_sqlalchemy(handler):
+    web.ctx.orm = scoped_session(sessionmaker(bind=engine))
+    try:
+        return handler()
+    except web.HTTPError:
+       web.ctx.orm.commit()
+       raise
+    except:
+        web.ctx.orm.rollback()
+        raise
+    finally:
+        web.ctx.orm.commit()
+
+
+urls = ('/', 'Index', '/invoice', 'Invoice')
+render = web.template.render('templates/', base='layout')
 
 app = web.application(urls, globals())
-
-render = web.template.render('templates/', base='layout')
+app.add_processor(load_sqlalchemy)
 
 
 class index:
