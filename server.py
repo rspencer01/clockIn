@@ -1,15 +1,14 @@
 from datetime import datetime
 import subprocess
 
-from sqlalchemy.orm import scoped_session, sessionmaker
 import web
 
 import clockIn
-from models import engine
+from models import db_session, Job, User, Work
 
 
 def load_sqlalchemy(handler):
-    web.ctx.orm = scoped_session(sessionmaker(bind=engine))
+    web.ctx.orm = db_session
     try:
         return handler()
     except web.HTTPError:
