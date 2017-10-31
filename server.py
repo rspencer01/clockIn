@@ -29,7 +29,7 @@ app = web.application(urls, globals())
 app.add_processor(load_sqlalchemy)
 
 
-class index:
+class Index:
     def GET(self):
         details = subprocess.Popen(
             ['clockIn', '-d'],
@@ -39,7 +39,7 @@ class index:
         return render.index(details)
 
 
-class invoice:
+class Invoice:
     def GET(self):
         today = datetime.utcnow()
 
