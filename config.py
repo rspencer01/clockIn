@@ -48,7 +48,9 @@ DATABASE_CONFIG_FILE_PATH = os.path.join(
     'database.cfg'
 )
 
-DB_CONF = get_configuration(DATABASE_CONFIG_FILE_PATH)
+
+def get_database_config():
+    return get_configuration(DATABASE_CONFIG_FILE_PATH)
 
 
 # Execute a module test
