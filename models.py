@@ -4,14 +4,16 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import create_database, database_exists
 
-from config import DB_CONF
+import config
 
+
+db_conf = config.get_database_config()
 
 db_url = URL(
-    drivername=DB_CONF.dbn,
-    username=DB_CONF.user,
-    password=DB_CONF.pw,
-    database=DB_CONF.db,
+    drivername=db_conf.dbn,
+    username=db_conf.user,
+    password=db_conf.pw,
+    database=db_conf.db,
 )
 engine = create_engine(db_url)
 

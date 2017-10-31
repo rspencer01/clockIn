@@ -1,13 +1,12 @@
 #!/usr/bin/python
-
 import datetime
 
 import web
 
-from config import DB_CONF
+import config
 
 
-db = web.database(**DB_CONF)
+db = web.database(**config.get_database_config())
 # Todo: correct this
 db.printing = False
 
