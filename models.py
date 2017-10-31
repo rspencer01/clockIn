@@ -1,7 +1,7 @@
 from sqlalchemy import Column, create_engine, DateTime, ForeignKey, Integer, String
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 from sqlalchemy_utils import create_database, database_exists
 
 import config
@@ -17,11 +17,14 @@ db_url = URL(
 )
 engine = create_engine(db_url)
 
+Session = sessionmaker(bind=engine)
+db_session = scoped_session(Session)
 Base = declarative_base()
 
 
 class User(Base):
     __tablename__ = 'users'
+    query = db_session.query_property()
 
     id = Column(Integer, primary_key=True)
     name = Column(String(length=255))
@@ -40,6 +43,7 @@ class User(Base):
 
 class Job(Base):
     __tablename__ = 'jobs'
+    query = db_session.query_property()
 
     id = Column(Integer, primary_key=True)
     name = Column(String(length=255))
@@ -64,13 +68,20 @@ class Job(Base):
 
 class Work(Base):
     __tablename__ = 'work'
+    query = db_session.query_property()
 
     id = Column(Integer, primary_key=True)
     start = Column(DateTime)
     duration = Column(Integer)
 
-    job_id = Column(Integer, ForeignKey('job.id'))
-    user_id = Column(Integer, ForeignKey('user.id'))
+    job_id = Column(Integer, ForeignKey('jobs.id'))
+    user_id = Column(Integer, ForeignKey('users.id'))
+
+    def __repr__(self):
+        return "<Work({job.name} - {user.name})>".format(
+            job=self.job,
+            user=self.user
+        )
 
 
 metadata = Base.metadata
