@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from sqlalchemy import Column, create_engine, DateTime, ForeignKey, Integer, String
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
@@ -85,6 +87,16 @@ class Work(Base):
 
 
 metadata = Base.metadata
+
+
+@contextmanager
+def sqlalchemy_db():
+    try:
+        yield db_session
+    except Exception:
+        db_session.rollback()
+    finally:
+        db_session.commit()
 
 
 if __name__ == "__main__":
