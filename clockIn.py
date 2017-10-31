@@ -1,59 +1,57 @@
 #!/usr/bin/python
-import datetime
+from datetime import datetime
 
-import web
+from sqlalchemy import func
 
-import config
+from models import Job, sqlalchemy_db, Work
 
-
-db = web.database(**config.get_database_config())
-# Todo: correct this
-db.printing = False
 
 current_job = -1
 
 
 def get_logged_in():
-    logged_in = 0
     global current_job
-    last = list(db.select('work', order='start DESC', limit=1))
 
-    if len(last) > 0:
-        logged_in = last[0]['duration'] is None
+    logged_in = False
+    most_recent_work = Work.query.order_by(Work.start.desc()).first()
+
+    if most_recent_work:
+        logged_in = most_recent_work.duration is None
 
     if logged_in:
-        current_job = db.query(
-            'SELECT jobs.* FROM work '
-            'JOIN jobs ON work.job=jobs.id '
-            'ORDER BY work.start DESC '
-            'LIMIT 1'
-        )[0]
+        current_job = Job.query.join(
+            Work.job
+        ).order_by(
+            Work.start.desc()
+        ).first()
+
     return logged_in
 
 
 def login_and_logout():
     logged_in = get_logged_in()
 
+    now = datetime.utcnow()
+
     if logged_in:
-        db.update(
-            'work',
-            where='ISNULL(duration) AND user=1',
-            duration=web.SQLLiteral(
-                'UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(start)'
-            )
-        )
+        with sqlalchemy_db() as session:
+            current_work = Work.query.filter(
+                Work.user_id == 1,
+                Work.duration.is_(None)
+            ).first()
+
+            current_work.duration = (now - current_work.start).seconds
+            session.add(current_work)
+
         print 'Logging out', current_job.name
     else:
         if current_job == -1:
             print 'ERROR: Select job id with -j'
             return
 
-        db.insert(
-            'work',
-            start=web.SQLLiteral('NOW()'),
-            user=1,
-            job=current_job
-        )
+        with sqlalchemy_db() as session:
+            new_work = Work(start=now, user=1, job=current_job)
+            session.add(new_work)
 
         print 'Logging in',
         logged_in = get_logged_in()
@@ -61,29 +59,20 @@ def login_and_logout():
 
 
 def get_time_for_month(month, year, job=current_job):
-    dts = '{year}-{month}-01 00:00:00'.format(year=year, month=month)
-
     next_year = year + (month == 12 and 1 or 0)
     next_month = (month % 12) + 1
-    next_dts = '{next_year}-{next_month}-01 00:00:00'.format(
-        next_year=next_year,
-        next_month=next_month,
-    )
 
-    seconds_this_month = db.select(
-        'work',
-        what='SUM(duration) as uptime',
-        where=(
-            'start < CAST($next_dts AS DATETIME) '
-            'AND start > CAST($dts AS DATETIME) '
-            'AND job=$job'
-        ),
-        vars={
-            'next_dts': next_dts,
-            'dts': dts,
-            'job': job,
-        }
-    )[0]['uptime'] or 0
+    dts = datetime(year, month, 1)
+    next_dts = datetime(next_year, next_month, 1)
+
+    with sqlalchemy_db():
+        seconds_this_month = Work.query.with_entities(
+            func.sum(Work.duration)
+        ).filter(
+            Work.start < next_dts,
+            Work.start > dts,
+            Work.job_id == job,
+        ).scalar() or 0
 
     return int(seconds_this_month)
 
@@ -119,8 +108,9 @@ def display():
     if logged_in:
         print '\nCurrently logged in on job', current_job.name
 
-        start_time = db.select('work', order='start DESC', limit=1)[0].start
-        time_working = datetime.datetime.now() - start_time
+        current_work = Work.query.order_by(Work.start.desc()).first()
+        start_time = current_work.start
+        time_working = datetime.now() - start_time
 
         logon = divmod(time_working.days * 86400 + time_working.seconds, 60)
         hours = logon[0] / 60
@@ -138,10 +128,10 @@ def display():
     if current_job == -1:
         return
 
-    hourly_rate = db.select('jobs', where={'id': str(current_job)})[0].rate
+    hourly_rate = current_job.rate
     print '=' * 20
 
-    now = datetime.datetime.now()
+    now = datetime.now()
     today = now.strftime('%Y-%m-%d')
     year, month = now.year, now.month
 
@@ -149,14 +139,14 @@ def display():
         month, year = 13, year - 1
 
     month -= 1
-    last_month = '{year}-{month}-01 00:00'.format(year=year, month=month)
+    last_month = datetime(year, month, 1)
 
-    seconds_today = db.select(
-        'work',
-        what='SUM(duration) AS uptime',
-        where='start > CAST($today AS DATETIME) AND job=$job',
-        vars={'today': today, 'job': current_job}
-    )[0]['uptime'] or 0
+    seconds_today = Work.query.with_entities(
+        func.sum(Work.duration)
+    ).filter(
+        Work.start > today,
+        Work.job == current_job,
+    ).scalar() or 0
 
     print format_overview('Today:', seconds_today, hourly_rate)
     print format_overview(
@@ -175,8 +165,8 @@ def print_jobs():
     print '{:3s} | {:40s} | {:4s}'.format('Id', 'Name', 'Rate')
     print '-' * 53
 
-    for job in db.select('jobs'):
-        print '{id:3d} | {name:40s} | R{rate:3d}'.format(**job)
+    for job in Job.query.all():
+        print '{job.id:3d} | {job.name:40s} | R{job.rate:3d}'.format(job=job)
 
 
 help = """ClockIn

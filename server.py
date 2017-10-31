@@ -41,9 +41,10 @@ class Index:
 class Invoice:
     def GET(self):
         today = datetime.utcnow()
+        web_input = web.input()
 
-        month = web.intget('month', today.month)
-        year = web.intget('year', today.year)
+        month = web.intget(web_input.get('month'), today.month)
+        year = web.intget(web_input.get('year'), today.year)
 
         this_month_datetime = '{year}-{month}-01 00:00:00'.format(
             year=year,
@@ -57,30 +58,34 @@ class Invoice:
             month=next_month
         )
 
-        actions = clockIn.db.select(
-            'work',
-            where=(
-                'start > $this_month '
-                'AND start < $next_month '
-                'AND JOB=$job'
-            ),
-            vars={
-                'this_month': this_month_datetime,
-                'next_month': next_month_datetime,
-                'job': web.input().job
-            }
+        job_id = web.intget(web_input.get('job'), 1)
+
+        actions = Work.query.filter(
+            Work.start > this_month_datetime,
+            Work.start < next_month_datetime,
+            Work.job_id == job_id,
         ).all()
 
-        job_id = web.intget('job')
-
         total = clockIn.get_time_for_month(month, year, job_id)
-        job = clockIn.db.select('jobs', where={'id': job_id}).first()
+
+        # Get user id. Default to the first user in the db
+        user_id = web.intget(web_input.get('user'), 1)
+        user = User.query.filter_by(id=user_id).first()
+        job = Job.query.filter_by(id=job_id).first()
 
         detailed_invoice = 'detailed' in web.input()
 
         invoice_template = web.template.frender('templates/invoice.html')
 
-        return invoice_template(actions, month, year, detailed_invoice, total, job)
+        return invoice_template(
+            actions=actions,
+            month=month,
+            year=year,
+            detailed=detailed_invoice,
+            total=total,
+            job=job,
+            user=user,
+        )
 
 
 if __name__ == '__main__':

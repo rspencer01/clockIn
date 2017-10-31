@@ -93,7 +93,7 @@ metadata = Base.metadata
 def sqlalchemy_db():
     try:
         yield db_session
-    except Exception:
+    except Exception as e:
         db_session.rollback()
     finally:
         db_session.commit()

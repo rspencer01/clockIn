@@ -1,4 +1,4 @@
-$def with (actions,month,year,detailed,total,job)
+$def with (actions,month,year,detailed,total,job,user)
 $code:
   months = ['January','February','March','April','May','June','July','August','September','October','November','December']
   textMonth = months[month-1]
@@ -10,26 +10,26 @@ $code:
   <body>
     <div class="container">
       <div class="header">
-        <h1>wwwdev</h1>
+        <h1>$user.company_name</h1>
 
         <h2>Invoice for $textMonth $year</h2>
 
         <div class='contactDetails'>
           <label>Contact Details</label>
           <ul>
-            <li><b>Phone</b> +27 (0)76 021 8434</li>
-            <li><b>Fax</b> +27 (0)21 532 2351</li>
-            <li><b>Email</b> info@wwwdev.co.za</li>
+            <li><b>Phone</b> $user.phone_number</li>
+            <li><b>Email</b> $user.email</li>
           </ul>
         </div>
 
         <div class='bankingDetails'>
           <label>Banking Details</label>
           <ul>
-            <li><b>Bank</b> Capitec Bank Limited</li>
-            <li><b>Branch</b> Mowbray (470010)</li>
-            <li><b>Account</b> 1339426860</li>
-            <li><b>BTC Wallet</b> <span class='btc'>1PhLe61vdJwrWfnR4pi5r8JSMmsL7eMfe3</span></li>
+            <li><b>Bank</b> $user.bank_name</li>
+            <li><b>Branch</b> $user.branch</li>
+            <li><b>Account</b> $user.account_number</li>
+            $if user.btc_wallet_address:
+                <li><b>BTC Wallet</b> <span class='btc'> $user.btc_wallet_address:</span></li>
           </ul>
         </div>
       </div>
@@ -37,7 +37,7 @@ $code:
       <div class='customerDetails'>
         <label>Customer Details</label>
         <ul>
-          <li><b>Attention</b> Alex Hawkings and Roger Zeino</li>
+          <li><b>Attention</b> $job.invoice_address_to</li>
           <li><b>Invoice Date</b> ${year + (month == 12 and 1 or 0)}-${"{:02d}".format(month % 12 + 1)}-01</li>
         </ul>
       </div>
@@ -62,12 +62,14 @@ $code:
           </td>
           <td><b>${"R {:,.2f}".format(job.rate * total / 3600.0).replace(',',' ')}</b></td>
         </tr>
-        <tr>
-          <td>&nbsp</td>
-          <td>&nbsp</td>
-          <td>&nbsp</td>
-          <td><b>$"BTC {:,.5f}".format((job.rate * total / 3600.0) / 2200).replace(',',' ')</b></td>
-        </tr>
+
+        $if user.btc_wallet_address:
+          <tr>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            <td>&nbsp</td>
+            <td><b>$"BTC {:,.5f}".format((job.rate * total / 3600.0) / 2200).replace(',',' ')</b></td>
+          </tr>
       </table>
 
       $if detailed:
