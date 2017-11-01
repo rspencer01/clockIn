@@ -2,5 +2,6 @@
 exclude = .git,__pycache__
 max-line-length = 79
 
-# Example: https://github.com/PyCQA/flake8-import-order/blob/master/tests/test_cases/complete_smarkets.py
-import-order-style = smarkets
+# Example: https://github.com/PyCQA/flake8-import-order/blob/master/tests/test_cases/complete_appnexus.py
+import-order-style = appnexus
+application-import-names = config,clockIn,models,server
