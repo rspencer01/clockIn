@@ -1,10 +1,16 @@
 from contextlib import contextmanager
 
-from sqlalchemy import Column, create_engine, DateTime, ForeignKey, Integer, String
+from sqlalchemy import (
+    Column,
+    create_engine,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+)
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
-from sqlalchemy_utils import create_database, database_exists
 
 import config
 
@@ -93,7 +99,7 @@ metadata = Base.metadata
 def sqlalchemy_db():
     try:
         yield db_session
-    except Exception as e:
+    except Exception:
         db_session.rollback()
         raise
     finally:
