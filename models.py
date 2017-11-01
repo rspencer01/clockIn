@@ -98,10 +98,3 @@ def sqlalchemy_db():
         raise
     finally:
         db_session.commit()
-
-
-if __name__ == "__main__":
-    if not database_exists(engine.url):
-        create_database(engine.url)
-
-    metadata.create_all(engine)
