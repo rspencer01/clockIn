@@ -128,7 +128,12 @@ def display():
     if current_job == -1:
         return
 
-    hourly_rate = current_job.rate
+    selected_job = Job.query.filter_by(id=current_job).first()
+    if not selected_job:
+        print 'Job %d does not exist' % current_job
+        return
+
+    hourly_rate = selected_job.rate
     print '=' * 20
 
     now = datetime.utcnow()
@@ -145,7 +150,7 @@ def display():
         func.sum(Work.duration)
     ).filter(
         Work.start > today,
-        Work.job == current_job,
+        Work.job == selected_job,
     ).scalar() or 0
 
     print format_overview('Today:', seconds_today, hourly_rate)
