@@ -110,7 +110,7 @@ def display():
 
         current_work = Work.query.order_by(Work.start.desc()).first()
         start_time = current_work.start
-        time_working = datetime.now() - start_time
+        time_working = datetime.utcnow() - start_time
 
         logon = divmod(time_working.days * 86400 + time_working.seconds, 60)
         hours = logon[0] / 60
@@ -131,7 +131,7 @@ def display():
     hourly_rate = current_job.rate
     print '=' * 20
 
-    now = datetime.now()
+    now = datetime.utcnow()
     today = now.strftime('%Y-%m-%d')
     year, month = now.year, now.month
 
