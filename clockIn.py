@@ -50,7 +50,7 @@ def login_and_logout():
             return
 
         with sqlalchemy_db() as session:
-            new_work = Work(start=now, user=1, job=current_job)
+            new_work = Work(start=now, user_id=1, job_id=current_job)
             session.add(new_work)
 
         print 'Logging in',
