@@ -74,7 +74,7 @@ def get_time_for_month(month, year, job=current_job):
             Work.job_id == job,
         ).scalar() or 0
 
-    return int(seconds_this_month)
+    return float(seconds_this_month)
 
 
 def plurality(word, count):
