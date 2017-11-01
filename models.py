@@ -71,7 +71,7 @@ class Job(Base):
         self.rate = rate
 
     def __repr__(self):
-        return "<Job(name='%s', rate='%d')>" % (self.name, self.rate)
+        return '<Job(name=%s, rate=%d)>' % (self.name, self.rate)
 
 
 class Work(Base):
@@ -86,7 +86,7 @@ class Work(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
 
     def __repr__(self):
-        return "<Work({job.name} - {user.name})>".format(
+        return '<Work({job.name} - {user.name})>'.format(
             job=self.job,
             user=self.user
         )
