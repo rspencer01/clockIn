@@ -103,10 +103,11 @@ def format_overview(label, time, hourly_rate):
 
 
 def display():
+    to_display = ''
     logged_in = get_logged_in()
 
     if logged_in:
-        print '\nCurrently logged in on job', current_job.name
+        to_display = '\nCurrently logged in on job %s' % current_job.name
 
         current_work = Work.query.order_by(Work.start.desc()).first()
         start_time = current_work.start
@@ -116,25 +117,24 @@ def display():
         hours = logon[0] / 60
         minutes = logon[0] % 60
         seconds = logon[1]
-        print 'Logged in for {hours} {minutes} {seconds}'.format(
+        to_display += '\nLogged in for {hours} {minutes} {seconds}'.format(
             hours='{} {}'.format(hours, plurality('hour', hours)),
             minutes='{} {}'.format(minutes, plurality('minute', minutes)),
             seconds='{} {}'.format(seconds, plurality('second', seconds))
         )
-        return
+        return to_display
     else:
-        print '\nCurrently logged out'
+        to_display += '\nCurrently logged out'
 
     if current_job == -1:
-        return
+        return to_display
 
     selected_job = Job.query.filter_by(id=current_job).first()
     if not selected_job:
-        print 'Job %d does not exist' % current_job
-        return
+        return 'Job %d does not exist' % current_job
 
     hourly_rate = selected_job.rate
-    print '=' * 20
+    to_display += '\n' + '=' * 20
 
     now = datetime.utcnow()
     today = now.strftime('%Y-%m-%d')
@@ -153,25 +153,31 @@ def display():
         Work.job == selected_job,
     ).scalar() or 0
 
-    print format_overview('Today:', seconds_today, hourly_rate)
-    print format_overview(
+    to_display += '\n' + format_overview('Today:', seconds_today, hourly_rate)
+    to_display += '\n' + format_overview(
         'This Month:',
         get_time_for_month(now.month, now.year, current_job),
         hourly_rate
     )
-    print format_overview(
+    to_display += '\n' + format_overview(
         'Last Month:',
-        get_time_for_month(month, year, current_job),
+        get_time_for_month(last_month.month, last_month.year, current_job),
         hourly_rate
     )
 
+    return to_display
 
-def print_jobs():
-    print '{:3s} | {:40s} | {:4s}'.format('Id', 'Name', 'Rate')
-    print '-' * 53
+
+def list_jobs():
+    to_display = '{:3s} | {:40s} | {:4s}'.format('Id', 'Name', 'Rate')
+    to_display += '\n' + '-' * 53
 
     for job in Job.query.all():
-        print '{job.id:3d} | {job.name:40s} | R{job.rate:3d}'.format(job=job)
+        to_display += (
+            '\n{job.id:3d} | {job.name:40s} | R{job.rate:3d}'.format(job=job)
+        )
+
+    return to_display
 
 
 help = """ClockIn
@@ -200,10 +206,10 @@ if __name__ == '__main__':
     current_job = arguments.job
 
     if arguments.ls:
-        print_jobs()
+        print list_jobs()
 
     if arguments.l:
         login_and_logout()
 
     if arguments.display:
-        display()
+        print display()
