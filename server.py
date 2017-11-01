@@ -1,5 +1,4 @@
 from datetime import datetime
-import subprocess
 
 import web
 
@@ -30,10 +29,7 @@ app.add_processor(load_sqlalchemy)
 
 class Index:
     def GET(self):
-        details = subprocess.Popen(
-            ['clockIn', '-d'],
-            stdout=subprocess.PIPE
-        ).communicate()[0]
+        details = clockIn.display()
 
         return render.index(details)
 
