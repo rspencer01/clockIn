@@ -95,6 +95,7 @@ def sqlalchemy_db():
         yield db_session
     except Exception as e:
         db_session.rollback()
+        raise
     finally:
         db_session.commit()
 
