@@ -1,10 +1,12 @@
 $def with (actions,month,year,detailed,total,job,user)
 $code:
+  header = "{job.name} Invoice - {year}-{month}".format(year=year, month=month, job=job)
   months = ['January','February','March','April','May','June','July','August','September','October','November','December']
   textMonth = months[month-1]
 <html>
   <head>
-    <link rel='stylesheet' type='text/css' href='/static/invoice.css'> 
+    <link rel='stylesheet' type='text/css' href='/static/invoice.css'>
+    <title>$header</title>
   </head>
 
   <body>

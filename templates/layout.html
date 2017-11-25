@@ -1,8 +1,15 @@
 $def with (content)
 
 <html>
+  <head>
+      <title>ClockIn</title>
+  </head>
   <body>
-    <h1>ClockIn</h1>
+    $if content.get('header'):
+      <h1>$content.header</h1>
+    $else:
+      <h1>ClockIn</h1>
+
     $if content.title:
       <h2>$content.title</h2>
     $:content

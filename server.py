@@ -29,9 +29,18 @@ app.add_processor(load_sqlalchemy)
 
 class Index:
     def GET(self):
-        details = clockIn.display()
+        all_jobs = Job.query.all()
 
-        return render.index(details)
+        job_id = web.input(job=None).job
+        selected_job = Job.query.filter_by(id=job_id).first()
+
+        details = clockIn.display(job_id)
+
+        return render.index(
+            details,
+            all_jobs=all_jobs,
+            selected_job=selected_job,
+        )
 
 
 class Invoice:
