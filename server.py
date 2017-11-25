@@ -34,7 +34,7 @@ class Index:
         job_id = web.input(job=None).job
         selected_job = Job.query.filter_by(id=job_id).first()
 
-        details = clockIn.display()
+        details = clockIn.display(job_id)
 
         return render.index(
             details,
