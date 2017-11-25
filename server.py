@@ -1,40 +1,56 @@
-import subprocess
-
-import clockIn
+from datetime import datetime
 
 import web
 
-urls = ('/', 'index', '/invoice', 'invoice')
+import clockIn
+from models import db_session, Job, User, Work
 
-app = web.application(urls, globals())
 
+def load_sqlalchemy(handler):
+    web.ctx.orm = db_session
+    try:
+        return handler()
+    except web.HTTPError:
+        web.ctx.orm.commit()
+        raise
+    except:
+        web.ctx.orm.rollback()
+        raise
+    finally:
+        web.ctx.orm.commit()
+
+
+urls = ('/', 'Index', '/invoice', 'Invoice')
 render = web.template.render('templates/', base='layout')
 
+app = web.application(urls, globals())
+app.add_processor(load_sqlalchemy)
 
-class index:
+
+class Index:
     def GET(self):
-        command = ['python', 'clockIn.py', '-d']
+        all_jobs = Job.query.all()
 
-        job = web.input(job=None).job
+        job_id = web.input(job=None).job
+        selected_job = Job.query.filter_by(id=job_id).first()
 
-        if job:
-            command.extend(['-j', job])
-            job = clockIn.db.select('jobs', where={'id': job}).first()
+        details = clockIn.display()
 
-        all_jobs = clockIn.db.select('jobs')
-
-        details = subprocess.Popen(
-            command,
-            stdout=subprocess.PIPE
-        ).communicate()[0]
-
-        return render.index(details, all_jobs=all_jobs, selected_job=job)
+        return render.index(
+            details,
+            all_jobs=all_jobs,
+            selected_job=selected_job,
+        )
 
 
-class invoice:
+class Invoice:
     def GET(self):
-        month = int(web.input().month)
-        year = int(web.input().year)
+        today = datetime.utcnow()
+        web_input = web.input()
+
+        month = web.intget(web_input.get('month'), today.month)
+        year = web.intget(web_input.get('year'), today.year)
+
         this_month_datetime = '{year}-{month}-01 00:00:00'.format(
             year=year,
             month=month
@@ -47,31 +63,34 @@ class invoice:
             month=next_month
         )
 
-        actions = clockIn.db.select(
-            'work',
-            where=(
-                'start > $this_month '
-                'AND start < $next_month '
-                'AND JOB=$job'
-            ),
-            vars={
-                'this_month': this_month_datetime,
-                'next_month': next_month_datetime,
-                'job': web.input().job
-            }
-        )
-        total = clockIn.get_time_for_month(month, year, web.input().job)
-        # job = clockIn.db.query('SELECT * FROM jobs WHERE id='+input().job)
-        response = web.template.frender('templates/invoice.html')(
-            list(actions),
-            month,
-            year,
-            'detailed' in web.input(),
-            total,
-            clockIn.db.select('jobs', where={'id': web.input().job})[0]
-        )
+        job_id = web.intget(web_input.get('job'), 1)
 
-        return response
+        actions = Work.query.filter(
+            Work.start > this_month_datetime,
+            Work.start < next_month_datetime,
+            Work.job_id == job_id,
+        ).all()
+
+        total = clockIn.get_time_for_month(month, year, job_id)
+
+        # Get user id. Default to the first user in the db
+        user_id = web.intget(web_input.get('user'), 1)
+        user = User.query.filter_by(id=user_id).first()
+        job = Job.query.filter_by(id=job_id).first()
+
+        detailed_invoice = 'detailed' in web.input()
+
+        invoice_template = web.template.frender('templates/invoice.html')
+
+        return invoice_template(
+            actions=actions,
+            month=month,
+            year=year,
+            detailed=detailed_invoice,
+            total=total,
+            job=job,
+            user=user,
+        )
 
 
 if __name__ == '__main__':

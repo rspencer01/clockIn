@@ -1,2 +1,4 @@
 *.pyc
 *.pdf
+config/database.cfg
+*.sqlite
