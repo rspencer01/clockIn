@@ -102,7 +102,7 @@ def format_overview(label, time, hourly_rate):
     )
 
 
-def display():
+def display(job):
     to_display = ''
     logged_in = get_logged_in()
 
@@ -126,12 +126,12 @@ def display():
     else:
         to_display += '\nCurrently logged out'
 
-    if current_job == -1:
+    if job == -1:
         return to_display
 
-    selected_job = Job.query.filter_by(id=current_job).first()
+    selected_job = Job.query.filter_by(id=job).first()
     if not selected_job:
-        return 'Job %d does not exist' % current_job
+        return 'Job %d does not exist' % job
 
     hourly_rate = selected_job.rate
     to_display += '\n' + '=' * 20
@@ -156,12 +156,12 @@ def display():
     to_display += '\n' + format_overview('Today:', seconds_today, hourly_rate)
     to_display += '\n' + format_overview(
         'This Month:',
-        get_time_for_month(now.month, now.year, current_job),
+        get_time_for_month(now.month, now.year, job),
         hourly_rate
     )
     to_display += '\n' + format_overview(
         'Last Month:',
-        get_time_for_month(last_month.month, last_month.year, current_job),
+        get_time_for_month(last_month.month, last_month.year, job),
         hourly_rate
     )
 
@@ -212,4 +212,4 @@ if __name__ == '__main__':
         login_and_logout()
 
     if arguments.display:
-        print display()
+        print display(current_job)
