@@ -12,7 +12,7 @@ $code:
   <body>
     <div class="container">
       <div class="header">
-        <h1>$user.company_name</h1>
+        <h1>${user.company_name or user.name}</h1>
 
         <h2>Invoice for $textMonth $year</h2>
 
@@ -39,7 +39,7 @@ $code:
       <div class='customerDetails'>
         <label>Customer Details</label>
         <ul>
-          <li><b>Attention</b> $job.invoice_address_to</li>
+          <li><b>Attention</b> ${job.invoice_address_to or job.name}</li>
           <li><b>Invoice Date</b> ${year + (month == 12 and 1 or 0)}-${"{:02d}".format(month % 12 + 1)}-01</li>
         </ul>
       </div>
