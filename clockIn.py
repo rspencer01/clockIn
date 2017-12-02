@@ -122,7 +122,6 @@ def display(job):
             minutes='{} {}'.format(minutes, plurality('minute', minutes)),
             seconds='{} {}'.format(seconds, plurality('second', seconds))
         )
-        return to_display
     else:
         to_display += '\nCurrently logged out'
 
